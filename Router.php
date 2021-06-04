@@ -21,13 +21,20 @@ class Router
         $pattern = "~^/?" . self::baseUrl . "$pattern" . "/?$~";
         $params = self::getMatches($pattern);
 
-        if($params)
-        {
-            if(is_callable($callback))
-            {
-                self::$noMatch = false;
+        if($params) {
+            if(is_callable($callback)) { 
+
                 $funcArgs = array_slice($params, 1);
-                $callback(...$funcArgs);
+                self::$noMatch = false;
+                
+                if(is_array($callback)) {
+                    $className  = $callback[0];
+                    $methodName = $callback[1];
+                    $instance   = $className::getInstance();
+                    $instance->$methodName(...$funcArgs);
+                } else {  
+                    $callback(...$funcArgs);
+                }
             }
         }
     }
